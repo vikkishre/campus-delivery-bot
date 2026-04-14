@@ -51,7 +51,7 @@ async function createOrder() {
     return;
   }
 
-  const res = await fetch("http://127.0.0.1:5000/order", {
+  const res = await fetch("https://campus-delivery-bot.onrender.com/order", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ items: selectedItems })
@@ -99,7 +99,7 @@ function goToTracking() {
 // 🏪 Admin
 // -----------------------------
 async function loadOrders() {
-  const res = await fetch("http://127.0.0.1:5000/orders");
+  const res = await fetch("https://campus-delivery-bot.onrender.com/orders");
   const orders = await res.json();
 
   const inProgress = document.getElementById("inProgress");
@@ -135,7 +135,7 @@ async function loadOrders() {
 }
 
 async function startDelivery(id) {
-  await fetch(`http://127.0.0.1:5000/start/${id}`, {
+  await fetch(`https://campus-delivery-bot.onrender.com/start/${id}`, {
     method: "POST"
   });
   loadOrders();
