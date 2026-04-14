@@ -1,11 +1,24 @@
 let currentOrderId = null;
 let currentQR = "";
 
-// -----------------------------
-// 🛒 Items
-// -----------------------------
-const items = ["Pen", "Notebook", "Pencil", "Eraser", "Marker", "Stapler"];
+// 🌐 Backend URL
+const BASE_URL = "https://campus-delivery-bot.onrender.com";
 
+// -----------------------------
+// 🛒 Items with Images
+// -----------------------------
+const items = [
+  { name: "Pen", img: "images/pen.png" },
+  { name: "Notebook", img: "images/notebook.png" },
+  { name: "Pencil", img: "images/pencil.png" },
+  { name: "Eraser", img: "images/eraser.png" },
+  { name: "Marker", img: "images/marker.png" },
+  { name: "Stapler", img: "images/stapler.png" }
+];
+
+// -----------------------------
+// 🧾 Load Items UI
+// -----------------------------
 function loadItems() {
   const container = document.getElementById("itemsContainer");
   if (!container) return;
@@ -17,14 +30,18 @@ function loadItems() {
     div.className = "item";
 
     div.innerHTML = `
-      <span>${item}</span>
-      <input type="number" min="0" value="0" id="${item}" />
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="${item.img}" width="40" height="40" style="border-radius:8px;" />
+        <span>${item.name}</span>
+      </div>
+      <input type="number" min="0" value="0" id="${item.name}" />
     `;
 
     container.appendChild(div);
   });
 }
 
+// Load items if on index page
 if (document.getElementById("itemsContainer")) {
   loadItems();
 }
@@ -35,39 +52,55 @@ if (document.getElementById("itemsContainer")) {
 async function createOrder() {
   const selectedItems = {};
 
+  // Stationery
   items.forEach(item => {
-    const qty = document.getElementById(item).value;
-    if (qty > 0) selectedItems[item] = qty;
+    const qty = document.getElementById(item.name).value;
+    if (qty > 0) selectedItems[item.name] = qty;
   });
 
+  // Electronics
   const customInput = document.getElementById("customComponents").value;
-
   if (customInput.trim() !== "") {
     selectedItems["Electronic Components"] = customInput;
   }
 
+  // Validation
   if (Object.keys(selectedItems).length === 0) {
     alert("Select items or enter components!");
     return;
   }
 
-  const res = await fetch("https://campus-delivery-bot.onrender.com/order", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ items: selectedItems })
-  });
+  try {
+    const res = await fetch(`${BASE_URL}/order`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ items: selectedItems })
+    });
 
-  const data = await res.json();
+    if (!res.ok) throw new Error("Server error");
 
-  currentOrderId = data.order.id;
+    const data = await res.json();
 
-  document.getElementById("orderInfo").innerText =
-    "Order ID: " + currentOrderId;
+    currentOrderId = data.order.id;
 
-  currentQR = JSON.stringify({
-    order_id: data.order.id,
-    token: data.order.token
-  });
+    document.getElementById("orderInfo").innerText =
+      "Order ID: " + currentOrderId;
+
+    currentQR = JSON.stringify({
+      order_id: data.order.id,
+      token: data.order.token
+    });
+
+    // 🧹 Reset inputs
+    items.forEach(item => {
+      document.getElementById(item.name).value = 0;
+    });
+    document.getElementById("customComponents").value = "";
+
+  } catch (err) {
+    alert("⚠️ Server not responding. Try again.");
+    console.error(err);
+  }
 }
 
 // -----------------------------
@@ -79,7 +112,12 @@ function openQR() {
     return;
   }
 
-  QRCode.toCanvas(document.getElementById("qrcode"), currentQR);
+  const canvas = document.getElementById("qrcode");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  QRCode.toCanvas(canvas, currentQR);
+
   document.getElementById("qrModal").style.display = "flex";
 }
 
@@ -96,49 +134,78 @@ function goToTracking() {
 }
 
 // -----------------------------
-// 🏪 Admin
+// 🏪 Go to Admin
 // -----------------------------
-async function loadOrders() {
-  const res = await fetch("https://campus-delivery-bot.onrender.com/orders");
-  const orders = await res.json();
-
-  const inProgress = document.getElementById("inProgress");
-  const delivered = document.getElementById("delivered");
-
-  if (!inProgress || !delivered) return;
-
-  inProgress.innerHTML = "";
-  delivered.innerHTML = "";
-
-  orders.forEach(order => {
-    const row = document.createElement("tr");
-
-    if (order.status !== "delivered") {
-      row.innerHTML = `
-        <td>${order.id}</td>
-        <td>${order.status}</td>
-        <td>${order.bot_status}</td>
-        <td>${formatItems(order.items)}</td>
-        <td><button onclick="startDelivery(${order.id})">Start</button></td>
-      `;
-      inProgress.appendChild(row);
-    } else {
-      row.innerHTML = `
-        <td>${order.id}</td>
-        <td>${order.status}</td>
-        <td>${order.bot_status}</td>
-        <td>${formatItems(order.items)}</td>
-      `;
-      delivered.appendChild(row);
-    }
-  });
+function goToAdmin() {
+  window.location.href = "/admin.html";
 }
 
+// -----------------------------
+// 🏪 Load Orders (Admin)
+// -----------------------------
+async function loadOrders() {
+  try {
+    const res = await fetch(`${BASE_URL}/orders`);
+    const orders = await res.json();
+
+    const inProgress = document.getElementById("inProgress");
+    const delivered = document.getElementById("delivered");
+
+    if (!inProgress || !delivered) return;
+
+    inProgress.innerHTML = "";
+    delivered.innerHTML = "";
+
+    orders.forEach(order => {
+      const row = document.createElement("tr");
+
+      if (order.status !== "delivered") {
+        row.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.status}</td>
+          <td>${order.bot_status}</td>
+          <td>${formatItems(order.items)}</td>
+          <td><button onclick="startDelivery(${order.id})">Start</button></td>
+        `;
+        inProgress.appendChild(row);
+        log(`Order ${order.id} active`);
+      } else {
+        row.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.status}</td>
+          <td>${order.bot_status}</td>
+          <td>${formatItems(order.items)}</td>
+        `;
+        delivered.appendChild(row);
+        log(`Order ${order.id} delivered`);
+      }
+    });
+
+  } catch (err) {
+    console.error("Failed to load orders", err);
+  }
+}
+
+// -----------------------------
+// 🚀 Start Delivery
+// -----------------------------
 async function startDelivery(id) {
-  await fetch(`https://campus-delivery-bot.onrender.com/start/${id}`, {
+  await fetch(`${BASE_URL}/start/${id}`, {
     method: "POST"
   });
   loadOrders();
+}
+
+// -----------------------------
+// 📜 Logs
+// -----------------------------
+function log(message) {
+  const logs = document.getElementById("logs");
+  if (!logs) return;
+
+  const time = new Date().toLocaleTimeString();
+  logs.innerHTML += `[${time}] ${message}<br>`;
+  logs.scrollTop = logs.scrollHeight;
 }
 
 // -----------------------------
@@ -155,6 +222,16 @@ function formatItems(items) {
     )
     .join(", ");
 }
-function goToAdmin() {
-  window.location.href = "admin.html";
+
+// -----------------------------
+// 🔄 Auto Refresh Admin
+// -----------------------------
+if (document.getElementById("inProgress")) {
+  loadOrders();
+  setInterval(loadOrders, 3000);
 }
+
+// -----------------------------
+// ⚡ Wake up backend (Render)
+// -----------------------------
+fetch(`${BASE_URL}/orders`);

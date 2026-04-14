@@ -2,41 +2,93 @@
 <html>
 <head>
   <title>Campus Delivery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
-      font-family: Arial;
-      padding: 20px;
-      background: #f4f6f9;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f6fa;
     }
 
+    /* 🔝 Navbar */
+    .navbar {
+      background: #ff4d4d;
+      color: white;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* 📦 Container */
+    .container {
+      padding: 15px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    /* 🧾 Card */
     .card {
       background: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
+    h3 {
+      margin-top: 0;
+    }
+
+    /* 🛒 Items */
     .item {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin: 10px 0;
     }
 
-    button {
-      padding: 10px;
-      background: #007bff;
-      color: white;
+    .item input {
+      width: 60px;
+      padding: 5px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    /* 🔘 Buttons */
+    .btn {
+      width: 100%;
+      padding: 12px;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 16px;
       cursor: pointer;
     }
 
+    .primary {
+      background: #ff4d4d;
+      color: white;
+    }
+
+    .secondary {
+      background: #007bff;
+      color: white;
+    }
+
+    .success {
+      background: #28a745;
+      color: white;
+    }
+
+    /* 📱 QR Modal */
     #qrModal {
       display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
     }
@@ -44,46 +96,65 @@
     #qrBox {
       background: white;
       padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
       border-radius: 10px;
+      border: 1px solid #ddd;
+      padding: 10px;
+    }
+
+    /* 📱 Responsive */
+    @media(max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<h2>🛒 Place Order</h2>
+<div class="navbar">🚚 Campus Delivery</div>
 
-<!-- Stationery -->
-<div class="card">
-  <h3>📚 Stationery</h3>
-  <div id="itemsContainer"></div>
+<div class="container">
+
+  <!-- 📚 Stationery -->
+  <div class="card">
+    <h3>📚 Stationery</h3>
+    <div id="itemsContainer"></div>
+  </div>
+
+  <!-- 🔌 Electronics -->
+  <div class="card">
+    <h3>🔌 Electronic Components</h3>
+    <textarea id="customComponents"
+      placeholder="Arduino, sensors, wires..."></textarea>
+  </div>
+
+  <!-- 🔘 Actions -->
+  <button class="btn primary" onclick="createOrder()">Place Order</button>
+
+  <div id="orderInfo" style="margin-top:10px; font-weight:bold;"></div>
+
+  <button class="btn secondary" onclick="openQR()">Open QR Code</button>
+  <button class="btn success" onclick="goToTracking()">Track Order</button>
+  <button class="btn" style="background:#333; color:white;" onclick="goToAdmin()">Admin Panel</button>
+
 </div>
-
-<!-- Electronics -->
-<div class="card">
-  <h3>🔌 Electronic Components</h3>
-  <textarea id="customComponents"
-    placeholder="Arduino, sensors, wires..."
-    rows="3" style="width:100%;">
-  </textarea>
-</div>
-
-<button onclick="createOrder()">Place Order</button>
-
-<h3 id="orderInfo"></h3>
-
-<button onclick="openQR()">Open QR</button>
-<button onclick="goToTracking()">Track</button>
 
 <!-- QR Modal -->
 <div id="qrModal">
   <div id="qrBox">
     <canvas id="qrcode"></canvas>
     <br><br>
-    <button onclick="closeQR()">Close</button>
+    <button class="btn primary" onclick="closeQR()">Close</button>
   </div>
 </div>
-<button onclick="goToAdmin()">Admin Panel</button>
+
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script src="script.js"></script>
 
