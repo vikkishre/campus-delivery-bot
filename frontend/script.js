@@ -155,3 +155,6 @@ function formatItems(items) {
     )
     .join(", ");
 }
+function goToAdmin() {
+  window.location.href = "admin.html";
+}
