@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      padding: 20px;
+    }
+
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #007bff;
+      color: white;
+    }
+
+    button {
+      padding: 5px 10px;
+      border: none;
+      background: green;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .logs {
+      height: 150px;
+      overflow-y: scroll;
+      background: #111;
+      color: #0f0;
+      padding: 10px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🏪 Admin Dashboard</h2>
+
+<button onclick="loadOrders()">Refresh</button>
+
+<div class="section">
+  <h3>🚚 In Progress (Active Deliveries)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+<th>Status</th>
+<th>Bot Status</th>
+<th>Ordered Items</th>   <!-- ✅ fixed -->
+<th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="inProgress"></tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h3>📦 Completed Deliveries</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Bot</th>
+      </tr>
+    </thead>
+    <tbody id="delivered"></tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h3>📜 System Logs</h3>
+  <div class="logs" id="logs"></div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
