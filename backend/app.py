@@ -38,7 +38,13 @@ def create_order():
         "order": order
     })
 
+@app.route('/active-order', methods=['GET'])
+def get_active_order():
+    for order in orders:
+        if order["status"] == "delivering":
+            return jsonify(order)
 
+    return jsonify({"message": "No active order"}), 404
 # -------------------------------
 # 📋 Get Orders
 # -------------------------------
@@ -52,11 +58,23 @@ def get_orders():
 # -------------------------------
 @app.route('/start/<int:order_id>', methods=['POST'])
 def start_delivery(order_id):
+
+    # ❌ check if already delivering
+    for o in orders:
+        if o["status"] == "delivering":
+            return jsonify({
+                "error": "Bot already delivering another order"
+            }), 400
+
+    # ✅ start new order
     for order in orders:
         if order["id"] == order_id:
             order["status"] = "delivering"
             order["bot_status"] = "moving"
-            return jsonify({"message": "Delivery started", "order": order})
+            return jsonify({
+                "message": "Delivery started",
+                "order": order
+            })
 
     return jsonify({"error": "Order not found"}), 404
 
@@ -118,3 +136,7 @@ def verify_qr():
 # -------------------------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+
+
+
