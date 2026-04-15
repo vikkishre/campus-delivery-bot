@@ -8,12 +8,12 @@
   // 🛒 Items with Images
   // -----------------------------
   const items = [
-    { name: "Pen", img: "images/pen.png" },
-    { name: "Notebook", img: "images/notebook.png" },
-    { name: "Pencil", img: "images/pencil.png" },
-    { name: "Eraser", img: "images/eraser.png" },
-    { name: "Marker", img: "images/marker.png" },
-    { name: "Stapler", img: "images/stapler.png" }
+    { name: "Pen", img: "images/pen1.jpg" },
+    { name: "Notebook", img: "images/notebook.jpg" },
+    { name: "Pencil", img: "images/pencil.jpg" },
+    { name: "Scissor", img: "images/scissor.jpg" },
+    { name: "Marker", img: "images/marker.jpg" },
+    { name: "Gum Tape", img: "images/tape.jpg" }
   ];
 
   // -----------------------------
