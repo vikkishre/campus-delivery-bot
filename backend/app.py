@@ -59,9 +59,12 @@ def get_orders():
 @app.route('/start/<int:order_id>', methods=['POST'])
 def start_delivery(order_id):
 
+    print(f"\n🚀 START BUTTON CLICKED for Order {order_id}")
+
     # ❌ check if already delivering
     for o in orders:
         if o["status"] == "delivering":
+            print("⚠️ Bot already delivering another order")
             return jsonify({
                 "error": "Bot already delivering another order"
             }), 400
@@ -71,11 +74,15 @@ def start_delivery(order_id):
         if order["id"] == order_id:
             order["status"] = "delivering"
             order["bot_status"] = "moving"
+
+            print(f"✅ Order {order_id} set to DELIVERING")
+
             return jsonify({
                 "message": "Delivery started",
                 "order": order
             })
 
+    print("❌ Order not found")
     return jsonify({"error": "Order not found"}), 404
 
 
@@ -85,7 +92,6 @@ def start_delivery(order_id):
 @app.route('/bot/status', methods=['POST'])
 def update_bot_status():
     data = request.json
-    order_id = data.get("order_id")
     bot_status = data.get("bot_status")
 
     for order in orders:
