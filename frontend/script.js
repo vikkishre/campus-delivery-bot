@@ -235,7 +235,29 @@
     loadOrders();
     setInterval(loadOrders, 3000);
   }
+// -----------------------------
+// 🔄 Reset Orders
+// -----------------------------
+async function resetOrders() {
 
+  const confirmReset = confirm("Are you sure you want to delete ALL orders?");
+
+  if (!confirmReset) return;
+
+  try {
+    await fetch(`${BASE_URL}/reset`, {
+      method: "POST"
+    });
+
+    log("🧹 All orders reset by admin");
+
+    loadOrders();
+
+  } catch (err) {
+    console.error("Reset failed", err);
+    alert("Failed to reset orders");
+  }
+}
   // -----------------------------
   // ⚡ Wake up backend (Render)
   // -----------------------------

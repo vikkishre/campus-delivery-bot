@@ -137,6 +137,23 @@ def verify_qr():
     return jsonify({"success": False}), 400
 
 
+
+# -------------------------------
+# 🔄 Reset All Orders
+# -------------------------------
+@app.route('/reset', methods=['POST'])
+def reset_orders():
+    global orders, current_order_id
+
+    orders = []
+    current_order_id = 1
+
+    print("\n🧹 ALL ORDERS RESET BY ADMIN")
+
+    return jsonify({
+        "message": "All orders cleared"
+    })
+
 # -------------------------------
 # ▶ Run
 # -------------------------------
